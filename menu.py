@@ -33,14 +33,15 @@ class Menu(arcade.Window):
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		if button == arcade.MOUSE_BUTTON_LEFT and self.menu_screen == 1 and 100 <= x <= 700 and 150 <= y <= 450:
-				self.menu_screen = 2
+			self.menu_screen = 2
 
 		elif button == arcade.MOUSE_BUTTON_LEFT and self.menu_screen == 2 and 100 <= x <= 700 and 150 <= y <= 450:
-				self.menu_screen = 1
+			self.menu_screen = 1
 
 
 def main():
 	window = Menu()
 	arcade.run()
+
 
 main()
