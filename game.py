@@ -33,7 +33,7 @@ Level 5: Not started
 
 
 TODO ASAP:
-Fix the self.player_list.append(self.player_sprite)
+Add movement
 """
 
 # Platformer
