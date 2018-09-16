@@ -24,12 +24,16 @@ Level 5:
 Medusa
 Stony
 
-TODO: Make the levels, make the character, make the enemies, give each health, implement keys
-Level 1: In development
+General TODO: Make the levels, make the character, make the enemies, give each health, implement keys
+Level 1: Completed
 Level 2: Not started
 Level 3: Not started
 Level 4: Not started
 Level 5: Not started
+
+
+TODO ASAP:
+Fix the self.player_list.append(self.player_sprite)
 """
 
 # Platformer
