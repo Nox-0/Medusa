@@ -49,7 +49,7 @@ SCREEN_HEIGHT = 600
 
 # Scaling
 # This is the scaling for the player sprite
-SPRITE_SCALING_PLAYER = 1
+SPRITE_SCALING_PLAYER = 0.7
 SPRITE_SCALING_WALL = 1
 
 # Physics
@@ -115,11 +115,11 @@ class Game(arcade.Window):
 		arcade.set_background_color(arcade.color.AMAZON)
 
 		# Makes the lists into arcade sprite lists which allow us to manipulate them much more easily
-		self.player_list = arcade.SpriteList
-		self.wall_list = arcade.SpriteList
-		self.snake_list = arcade.SpriteList
-		self.key_list = arcade.SpriteList
-		self.all_sprites_list = arcade.SpriteList
+		self.player_list = arcade.SpriteList()
+		self.wall_list = arcade.SpriteList()
+		self.snake_list = arcade.SpriteList()
+		self.key_list = arcade.SpriteList()
+		self.all_sprites_list = arcade.SpriteList()
 
 		# Sets the current_stage variable as 0 each setup
 		self.current_stage = 0
@@ -148,14 +148,22 @@ class Game(arcade.Window):
 				5 = left ramp support
 				6 = green lock
 				"""
-				if item == -1: continue
-				elif item == 0: wall = arcade.Sprite("grassLeft.png", SPRITE_SCALING_WALL)
-				elif item == 1: wall = arcade.Sprite("grassMid.png", SPRITE_SCALING_WALL)
-				elif item == 2: wall = arcade.Sprite("grassRight.png", SPRITE_SCALING_WALL)
-				elif item == 3: wall = arcade.Sprite("grassCenter.png", SPRITE_SCALING_WALL)
-				elif item == 4: wall = arcade.Sprite("grassHillLeft.png", SPRITE_SCALING_WALL)
-				elif item == 5: wall = arcade.Sprite("grassHillLeft2.png", SPRITE_SCALING_WALL)
-				elif item == 6: wall = arcade.Sprite("lock_green.png", SPRITE_SCALING_WALL)
+				if item == -1:
+					continue
+				elif item == 0:
+					wall = arcade.Sprite("grassLeft.png", SPRITE_SCALING_WALL)
+				elif item == 1:
+					wall = arcade.Sprite("grassMid.png", SPRITE_SCALING_WALL)
+				elif item == 2:
+					wall = arcade.Sprite("grassRight.png", SPRITE_SCALING_WALL)
+				elif item == 3:
+					wall = arcade.Sprite("grassCenter.png", SPRITE_SCALING_WALL)
+				elif item == 4:
+					wall = arcade.Sprite("grassHillLeft.png", SPRITE_SCALING_WALL)
+				elif item == 5:
+					wall = arcade.Sprite("grassHillLeft2.png", SPRITE_SCALING_WALL)
+				elif item == 6:
+					wall = arcade.Sprite("lock_green.png", SPRITE_SCALING_WALL)
 
 				# Calculates where the sprite goes
 				wall.right = column_index * 64
