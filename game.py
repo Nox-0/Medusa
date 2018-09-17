@@ -34,7 +34,6 @@ Level 5: Not started
 
 
 TODO ASAP:
-Made movement smoother
 """
 
 # Platformer
@@ -224,8 +223,20 @@ class Game(arcade.Window):
 
 	def on_key_release(self, key, modifiers):
 		# Whenever the a key is released
-		if key == arcade.key.LEFT or key == arcade.key.RIGHT:
-			self.player_sprite.change_x = 0
+		# When the left key is released
+		if key == arcade.key.LEFT:
+			# If the player is already going right, nothing happens
+			if self.player_sprite.change_x == MOVEMENT_SPEED:
+				pass
+			# If the player isn't going right then they stop
+			else:
+				self.player_sprite.change_x = 0
+
+		if key == arcade.key.RIGHT:
+			if self.player_sprite.change_x == -MOVEMENT_SPEED:
+				pass
+			else:
+				self.player_sprite.change_x = 0
 
 	def update(self, delta_time):
 		# Same as on_draw method. Renders at 60fps
