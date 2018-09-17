@@ -35,7 +35,6 @@ Level 5: Not started
 
 TODO ASAP:
 Made movement smoother
-Make ramps
 """
 
 # Platformer
@@ -51,8 +50,11 @@ SCREEN_HEIGHT = 700
 
 # Scaling
 # This is the scaling for the player sprite
-SPRITE_SCALING_PLAYER = 0.91
+SPRITE_SCALING_PLAYER = 0.92
 SPRITE_SCALING_WALL = 0.92
+SPRITE_PIXEL_SIZE = 70
+GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * SPRITE_SCALING_WALL)
+
 
 # Viewport
 # How many pixels to leave between player and the edge of the screen
@@ -120,6 +122,9 @@ class Game(arcade.Window):
 		self.view_left = 0
 		self.view_bottom = 0
 
+		# Right edge of the map (in pixels)
+		self.end_of_map = 0
+
 	# Custom method called setup which sets everything up so that the user can play
 	def setup(self):
 		# Set the background colour as "AMAZON"
@@ -145,6 +150,18 @@ class Game(arcade.Window):
 
 		map_array = get_map("level_1_map.csv")
 
+		# Right edge of the map
+		self.end_of_map = len(map_array[0]) * GRID_PIXEL_SIZE
+
+		# Makes an array with each item and what the image is called. It is important to note that arrays start at 0
+		map_items = ["grassLeft.png",
+		             "grassMid.png",
+		             "grassRight.png",
+		             "grassCenter.png",
+		             "grassHillLeft.png",
+		             "grassHillLeft2.png",
+		             "lock_green.png"]
+
 		# Loops through array and makes sprites
 		for row_index, row in enumerate(map_array):
 			for column_index, item in enumerate(row):
@@ -159,22 +176,19 @@ class Game(arcade.Window):
 				5 = left ramp support
 				6 = green lock
 				"""
+				# If the item is empty then it spawns no sprites there
 				if item == -1:
 					continue
-				elif item == 0:
-					wall = arcade.Sprite("grassLeft.png", SPRITE_SCALING_WALL)
-				elif item == 1:
-					wall = arcade.Sprite("grassMid.png", SPRITE_SCALING_WALL)
-				elif item == 2:
-					wall = arcade.Sprite("grassRight.png", SPRITE_SCALING_WALL)
-				elif item == 3:
-					wall = arcade.Sprite("grassCenter.png", SPRITE_SCALING_WALL)
-				elif item == 4:
-					wall = arcade.Sprite("grassHillLeft.png", SPRITE_SCALING_WALL)
-				elif item == 5:
-					wall = arcade.Sprite("grassHillLeft2.png", SPRITE_SCALING_WALL)
-				elif item == 6:
-					wall = arcade.Sprite("lock_green.png", SPRITE_SCALING_WALL)
+				else:
+					# This is half genius
+					# Takes the number from the .csv and then assigns the image in the array that is in that position to wall
+					wall = arcade.Sprite("images/" + map_items[item], SPRITE_SCALING_WALL)
+
+					# If the item is a ramp it edits the points of collision and they become as shown
+					if item == 4:
+						wall.points = ((wall.width // 2, -wall.height // 2),
+						               (-wall.width // 2, -wall.height // 2),
+						               (wall.width // 2, wall.height // 2))
 
 				# Calculates where the sprite goes
 				wall.right = column_index * 64
