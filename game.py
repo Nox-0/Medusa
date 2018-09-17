@@ -24,7 +24,8 @@ Level 5:
 Medusa
 Stony
 
-General TODO: Make the levels, make the character, make the enemies, give each health, implement keys
+TODO general: Make the levels, make the character, make the enemies, give each health, implement keys.
+TODO after: Add stage progression and menus
 Level 1: Completed
 Level 2: Not started
 Level 3: Not started
@@ -33,7 +34,8 @@ Level 5: Not started
 
 
 TODO ASAP:
-Add movement
+Made movement smoother
+Make ramps
 """
 
 # Platformer
@@ -49,14 +51,19 @@ SCREEN_HEIGHT = 600
 
 # Scaling
 # This is the scaling for the player sprite
-SPRITE_SCALING_PLAYER = 0.7
-SPRITE_SCALING_WALL = 1
+SPRITE_SCALING_PLAYER = 0.91
+SPRITE_SCALING_WALL = 0.92
+
+# Viewport
+# How many pixels to leave between player and the edge of the screen
+VIEWPORT_MARGIN = 40
+RIGHT_MARGIN = 150
 
 # Physics
 # Sets the movement speed
 MOVEMENT_SPEED = 5
 JUMP_SPEED = 14
-GRAVITY = 0.5
+GRAVITY = 0.7
 
 
 def get_map(filename):
@@ -108,6 +115,10 @@ class Game(arcade.Window):
 		self.player_sprite = None
 
 		self.physics_engine = None
+
+		# Used to view port
+		self.view_left = 0
+		self.view_bottom = 0
 
 	# Custom method called setup which sets everything up so that the user can play
 	def setup(self):
@@ -183,6 +194,64 @@ class Game(arcade.Window):
 
 		# Draws all sprites
 		self.all_sprites_list.draw()
+
+	def on_key_press(self, key, modifiers):
+		# Called whenever a key is pressed
+		# Checks for which key is pressed
+		if key == arcade.key.UP:
+			# Checks if there is a platform beneath the character's feet.
+			# You can't jump if you don't have a platform to jump from.
+			if self.physics_engine.can_jump():
+				self.player_sprite.change_y = JUMP_SPEED
+		if key == arcade.key.LEFT:
+			self.player_sprite.change_x = -MOVEMENT_SPEED
+		if key == arcade.key.RIGHT:
+			self.player_sprite.change_x = MOVEMENT_SPEED
+
+	def on_key_release(self, key, modifiers):
+		# Whenever the a key is released
+		if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+			self.player_sprite.change_x = 0
+
+	def update(self, delta_time):
+		# Same as on_draw method. Renders at 60fps
+		# Separate function because here I will cover the movement and game logic
+
+		# Updates all of the sprites
+		self.physics_engine.update()
+
+		# View port stuff here
+
+		# Checks if view port needs to be changed or not
+		changed = False
+
+		# Scroll left
+		left_bndry = self.view_left + VIEWPORT_MARGIN
+		if self.player_sprite.left < left_bndry:
+			self.view_left -= left_bndry - self.player_sprite.left
+			changed = True
+
+		# Scroll right
+		right_bndry = self.view_left + SCREEN_WIDTH - RIGHT_MARGIN
+		if self.player_sprite.right > right_bndry:
+			self.view_left += self.player_sprite.right - right_bndry
+			changed = True
+
+		# Scroll up
+		top_bndry = self.view_bottom + SCREEN_HEIGHT - VIEWPORT_MARGIN
+		if self.player_sprite.top > top_bndry:
+			self.view_bottom += self.player_sprite.top - top_bndry
+			changed = True
+
+		# Scroll down
+		bottom_bndry = self.view_bottom + VIEWPORT_MARGIN
+		if self.player_sprite.bottom < bottom_bndry:
+			self.view_bottom -= bottom_bndry - self.player_sprite.bottom
+			changed = True
+
+		# If we need to scroll, go ahead and do it.
+		if changed:
+			arcade.set_viewport(self.view_left, SCREEN_WIDTH + self.view_left, self.view_bottom, SCREEN_HEIGHT + self.view_bottom)
 
 
 # The main function which runs the game
