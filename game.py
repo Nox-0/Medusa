@@ -46,8 +46,8 @@ import arcade
 # Constants
 
 # Screen sizing assigned here as constants. Measured in pixels.
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 700
 
 # Scaling
 # This is the scaling for the player sprite
