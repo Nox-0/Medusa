@@ -207,7 +207,25 @@ class Game(arcade.Window):
 			self.all_sprites_list.append(snake)
 
 		# Sets up the player
-		self.player_sprite = arcade.Sprite("characterRight.png", SPRITE_SCALING_PLAYER)
+		self.player_sprite = arcade.AnimatedWalkingSprite()
+
+		# Walking animation
+		self.player_sprite.stand_right_textures = []
+		self.player_sprite.stand_right_textures.append(arcade.load_texture("images/character.png", scale=SPRITE_SCALING_PLAYER))
+
+		self.player_sprite.stand_left_textures = []
+		self.player_sprite.stand_left_textures.append(arcade.load_texture("images/character.png", scale=SPRITE_SCALING_PLAYER, mirrored=True))
+
+		self.player_sprite.walk_right_textures = []
+		self.player_sprite.walk_right_textures.append(arcade.load_texture("images/characterw0.png", scale=SPRITE_SCALING_PLAYER))
+		self.player_sprite.walk_right_textures.append(arcade.load_texture("images/characterw1.png", scale=SPRITE_SCALING_PLAYER))
+
+		self.player_sprite.walk_left_textures = []
+		self.player_sprite.walk_left_textures.append(arcade.load_texture("images/characterw0.png", scale=SPRITE_SCALING_PLAYER, mirrored=True))
+		self.player_sprite.walk_left_textures.append(arcade.load_texture("images/characterw1.png", scale=SPRITE_SCALING_PLAYER, mirrored=True))
+
+		self.player_sprite.texture_change_distance = 40
+
 		# Starting positions
 		self.player_sprite.center_x = 100
 		self.player_sprite.center_y = 270
@@ -288,11 +306,9 @@ class Game(arcade.Window):
 		if key == arcade.key.LEFT:
 			self.player_sprite.change_x = -MOVEMENT_SPEED
 			self.player_direction = "left"
-			self.player_sprite.texture = arcade.load_texture("characterLeft.png")
 		if key == arcade.key.RIGHT:
 			self.player_sprite.change_x = MOVEMENT_SPEED
 			self.player_direction = "right"
-			self.player_sprite.texture = arcade.load_texture("characterRight.png")
 
 		if key == arcade.key.SPACE:
 			arrow = arcade.Sprite("arrow.png", SPRITE_SCALING_ARROW)
@@ -330,6 +346,7 @@ class Game(arcade.Window):
 
 		self.snake_list.update()
 		self.arrow_list.update()
+		self.all_sprites_list.update_animation()
 
 		if self.player_health == 0:
 			self.player_sprite.kill()
