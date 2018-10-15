@@ -33,13 +33,14 @@ Level 4: Not started
 Level 5: Not started
 
 
-TODO ASAP:
+TODO ASAP: Health, keys, animations
 """
 
 # Platformer
 
-# Import the arcade library
+# Import the arcade and random library
 import arcade
+import random
 
 # Constants
 
@@ -50,7 +51,9 @@ SCREEN_HEIGHT = 700
 # Scaling
 # This is the scaling for the player sprite
 SPRITE_SCALING_PLAYER = 0.92
+SPRITE_SCALING_SNAKE = 0.92
 SPRITE_SCALING_WALL = 0.92
+SPRITE_SCALING_ARROW = 1
 SPRITE_PIXEL_SIZE = 70
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * SPRITE_SCALING_WALL)
 
@@ -65,6 +68,42 @@ RIGHT_MARGIN = 150
 MOVEMENT_SPEED = 5
 JUMP_SPEED = 14
 GRAVITY = 0.7
+ARROW_SPEED = 10
+
+
+class Snake(arcade.Sprite):
+	def __init__(self, filename, sprite_scaling):
+		super().__init__(filename, sprite_scaling)
+
+		self.change_x = 0
+
+		self.moved = 0
+		self.direction = None
+
+		self.health = 0
+
+		self.max_distance = 0
+		self.distance = 0
+
+	def update(self):
+
+		# Snake moving mechanics
+		if 0 <= self.moved <= 200 and self.direction == "right":
+			self.center_x += self.change_x
+			self.moved += self.change_x
+			self.texture = arcade.load_texture("snakeRight.png")
+
+		# Once snake moves X pixels, change the direction
+		if self.moved == 200:
+			self.direction = "left"
+
+		if self.moved <= 200 and self.direction == "left":
+			self.center_x -= self.change_x
+			self.moved -= self.change_x
+			self.texture = arcade.load_texture("snakeLeft.png")
+
+		if self.moved == 0:
+			self.direction = "right"
 
 
 def get_map(filename):
@@ -110,10 +149,15 @@ class Game(arcade.Window):
 		self.wall_list = None
 		self.snake_list = None
 		self.key_list = None
+		self.arrow_list = None
+
+		self.snake_count = 0
 
 		self.all_sprites_list = None
 
 		self.player_sprite = None
+		self.player_health = 0
+		self.player_direction = None
 
 		self.physics_engine = None
 
@@ -126,26 +170,51 @@ class Game(arcade.Window):
 
 	# Custom method called setup which sets everything up so that the user can play
 	def setup(self):
+
+		# Sets the current_stage variable as 0 each setup
+		self.current_stage = 1
 		# Set the background colour as "AMAZON"
 		arcade.set_background_color(arcade.color.AMAZON)
+
+		if self.current_stage == 1:
+			self.snake_count = 1
+		elif self.current_stage == 2:
+			self.snake_count = 5
+		elif self.current_stage == 3:
+			self.snake_count = 10
+		elif self.current_stage == 4:
+			self.snake_count = 20
 
 		# Makes the lists into arcade sprite lists which allow us to manipulate them much more easily
 		self.player_list = arcade.SpriteList()
 		self.wall_list = arcade.SpriteList()
 		self.snake_list = arcade.SpriteList()
 		self.key_list = arcade.SpriteList()
+		self.arrow_list = arcade.SpriteList()
 		self.all_sprites_list = arcade.SpriteList()
 
-		# Sets the current_stage variable as 0 each setup
-		self.current_stage = 0
+		for snake in range(self.snake_count):
+			snake = Snake("snakeRight.png", SPRITE_SCALING_SNAKE)
+			snake.change_x = random.randrange(1, 3)
+
+			snake.moved = 0
+
+			if self.current_stage == 1:
+				snake.center_x = 1800
+				snake.center_y = 128.8
+
+			self.snake_list.append(snake)
+			self.all_sprites_list.append(snake)
 
 		# Sets up the player
-		self.player_sprite = arcade.Sprite("character.png", SPRITE_SCALING_PLAYER)
+		self.player_sprite = arcade.Sprite("characterRight.png", SPRITE_SCALING_PLAYER)
 		# Starting positions
 		self.player_sprite.center_x = 100
 		self.player_sprite.center_y = 270
 		self.player_list.append(self.player_sprite)
 		self.all_sprites_list.append(self.player_sprite)
+
+		self.player_health = 6
 
 		map_array = get_map("level_1_map.csv")
 
@@ -218,8 +287,25 @@ class Game(arcade.Window):
 				self.player_sprite.change_y = JUMP_SPEED
 		if key == arcade.key.LEFT:
 			self.player_sprite.change_x = -MOVEMENT_SPEED
+			self.player_direction = "left"
+			self.player_sprite.texture = arcade.load_texture("characterLeft.png")
 		if key == arcade.key.RIGHT:
 			self.player_sprite.change_x = MOVEMENT_SPEED
+			self.player_direction = "right"
+			self.player_sprite.texture = arcade.load_texture("characterRight.png")
+
+		if key == arcade.key.SPACE:
+			arrow = arcade.Sprite("arrow.png", SPRITE_SCALING_ARROW)
+
+			arrow.center_x = self.player_sprite.center_x
+			arrow.center_y = self.player_sprite.center_y
+			if self.player_direction == "left":
+				arrow.change_x = -ARROW_SPEED
+			elif self.player_direction == "right":
+				arrow.change_x = ARROW_SPEED
+
+			self.arrow_list.append(arrow)
+			self.all_sprites_list.append(arrow)
 
 	def on_key_release(self, key, modifiers):
 		# Whenever the a key is released
@@ -241,6 +327,25 @@ class Game(arcade.Window):
 	def update(self, delta_time):
 		# Same as on_draw method. Renders at 60fps
 		# Separate function because here I will cover the movement and game logic
+
+		self.snake_list.update()
+		self.arrow_list.update()
+
+		if self.player_health == 0:
+			self.player_sprite.kill()
+			
+		for arrow in self.arrow_list:
+
+			snake_hit_list = arcade.check_for_collision_with_list(arrow, self.snake_list)
+			wall_hit_list = arcade.check_for_collision_with_list(arrow, self.wall_list)
+
+			hit_list = snake_hit_list + wall_hit_list
+
+			if len(hit_list) > 0:
+				arrow.kill()
+
+			for snake in snake_hit_list:
+				snake.kill()
 
 		# Updates all of the sprites
 		self.physics_engine.update()
