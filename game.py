@@ -91,7 +91,7 @@ class Snake(arcade.Sprite):
 		if 0 <= self.moved <= 200 and self.direction == "right":
 			self.center_x += self.change_x
 			self.moved += self.change_x
-			self.texture = arcade.load_texture("snakeRight.png")
+			self.texture = arcade.load_texture("images/snakeRight.png")
 
 		# Once snake moves X pixels, change the direction
 		if self.moved == 200:
@@ -100,7 +100,7 @@ class Snake(arcade.Sprite):
 		if self.moved <= 200 and self.direction == "left":
 			self.center_x -= self.change_x
 			self.moved -= self.change_x
-			self.texture = arcade.load_texture("snakeLeft.png")
+			self.texture = arcade.load_texture("images/snakeLeft.png")
 
 		if self.moved == 0:
 			self.direction = "right"
@@ -194,7 +194,7 @@ class Game(arcade.Window):
 		self.all_sprites_list = arcade.SpriteList()
 
 		for snake in range(self.snake_count):
-			snake = Snake("snakeRight.png", SPRITE_SCALING_SNAKE)
+			snake = Snake("images/snakeRight.png", SPRITE_SCALING_SNAKE)
 			snake.change_x = random.randrange(1, 3)
 
 			snake.moved = 0
@@ -311,7 +311,7 @@ class Game(arcade.Window):
 			self.player_direction = "right"
 
 		if key == arcade.key.SPACE:
-			arrow = arcade.Sprite("arrow.png", SPRITE_SCALING_ARROW)
+			arrow = arcade.Sprite("images/arrow.png", SPRITE_SCALING_ARROW)
 
 			arrow.center_x = self.player_sprite.center_x
 			arrow.center_y = self.player_sprite.center_y
