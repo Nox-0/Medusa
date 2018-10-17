@@ -53,6 +53,7 @@ SCREEN_HEIGHT = 700
 SPRITE_SCALING_PLAYER = 0.92
 SPRITE_SCALING_SNAKE = 0.92
 SPRITE_SCALING_WALL = 0.92
+SPRITE_SCALING_KEY = 2
 SPRITE_SCALING_ARROW = 1
 SPRITE_PIXEL_SIZE = 70
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * SPRITE_SCALING_WALL)
@@ -60,7 +61,7 @@ GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * SPRITE_SCALING_WALL)
 
 # Viewport
 # How many pixels to leave between player and the edge of the screen
-VIEWPORT_MARGIN = 40
+VIEWPORT_MARGIN = 100
 RIGHT_MARGIN = 150
 
 # Physics
@@ -200,8 +201,8 @@ class Game(arcade.Window):
 			snake.moved = 0
 
 			if self.current_stage == 1:
-				snake.center_x = 1800
-				snake.center_y = 128.8
+				snake.center_x = 1850
+				snake.center_y = 0
 
 			self.snake_list.append(snake)
 			self.all_sprites_list.append(snake)
@@ -224,11 +225,11 @@ class Game(arcade.Window):
 		self.player_sprite.walk_left_textures.append(arcade.load_texture("images/characterw0.png", scale=SPRITE_SCALING_PLAYER, mirrored=True))
 		self.player_sprite.walk_left_textures.append(arcade.load_texture("images/characterw1.png", scale=SPRITE_SCALING_PLAYER, mirrored=True))
 
-		self.player_sprite.texture_change_distance = 40
+		self.player_sprite.texture_change_distance = 30
 
 		# Starting positions
-		self.player_sprite.center_x = 100
-		self.player_sprite.center_y = 270
+		self.player_sprite.center_x = 270
+		self.player_sprite.center_y = 50
 		self.player_list.append(self.player_sprite)
 		self.all_sprites_list.append(self.player_sprite)
 
@@ -363,6 +364,14 @@ class Game(arcade.Window):
 
 			for snake in snake_hit_list:
 				snake.kill()
+
+				if snake_hit_list == self.snake_list:
+					key_green = arcade.Sprite("images/keyGreen.png", SPRITE_SCALING_KEY)
+
+					key_green.center_x = snake.center_x
+					key_green.center_y = snake.center_y
+
+					self.all_sprites_list.append(key_green)
 
 		# Updates all of the sprites
 		self.physics_engine.update()
